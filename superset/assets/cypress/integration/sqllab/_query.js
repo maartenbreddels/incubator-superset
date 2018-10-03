@@ -72,19 +72,21 @@ export default () => {
       cy.visit('/sqllab/my_queries/');
 
       // first row contains most recent link, follow back to SqlLab
-      cy.get('table tr:first-child a[href*="savedQueryId"').click();
+      cy.get('table tr:first-child a[href*="savedQueryId"')
+        .click()
+        .then(() => {
+          // run the saved query
+          cy.get('#js-sql-toolbar button')
+            .eq(0) // run query
+            .click();
 
-      // run the saved query
-      cy.get('#js-sql-toolbar button')
-        .eq(0) // run query
-        .click();
+          // assert the results of the saved query match the initial results
+          selectResultsTab().then((resultsB) => {
+            savedQueryResultsTable = resultsB[0];
 
-      // assert the results of the saved query match the initial results
-      selectResultsTab().then((resultsB) => {
-        savedQueryResultsTable = resultsB[0];
-
-        assertSQLLabResultsAreEqual(initialResultsTable, savedQueryResultsTable);
-      });
+            assertSQLLabResultsAreEqual(initialResultsTable, savedQueryResultsTable);
+          });
+        });
     });
   });
 };
